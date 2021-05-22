@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+	<typeAliases>
+	<!-- 
+		<typeAlias type="com.spring.biz.board.BoardVO" alias="board"/>
+		-->
+		<typeAlias type="ga.bowwow.user.UserAccount" alias="UserAccount"/>
+		<typeAlias type="ga.bowwow.pet.Pet" alias="pet"/>
+	</typeAliases>
+
+  <mappers>
+    <!-- 
+    <mapper resource=""/>
+     -->
+    <mapper resource="mappings/UserMapper.xml"/> 
+    <mapper resource="mappings/PetMapper.xml"/> 
+  </mappers>
+</configuration>

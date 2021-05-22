@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserAccount">
+
+<!-- TODO SearchAccount의 동적검색을 추가해야 함 -->
+<!-- TODO SearchAccount를 List형태로 돌려주는 것으로 변환해야 함 -->
+	
+    <resultMap id="nestedAddressUserAccount" type="UserDTO">
+		<id property="member_serial" column="member_Serial" jdbcType="INTEGER" />
+		<result property="id" column="id" />
+		<result property="email" column="email" />
+		<result property="citizen_id" column="citizen_Id" />
+		<result property="phone" column="phone" />
+		<result property="password" column="password" />
+		<result property="status" column="status" />
+		<result property="point" column="point" />
+		<result property="coupons" column="coupons" />
+		<result property="image_source" column="image_Source" />
+		<result property="nickname" column="nickname" />
+		<result property="realname" column="realname" />
+		<result property="reg_date" column="regDate" />
+		<result property="birthday" column="birthday" />
+		<result property="gender" column="gender" />
+<!-- 		mybatis collection/컬렉션에 대해 이해하기 전까지 보류 -->
+<!-- 	  <collection property="userAddress" column="MEMBER_SERIAL" select="UserAddress.getUserAddressList"> -->
+<!-- 		<id property="memberSerial" column="member_Serial" /> -->
+<!-- 		<result property="addressId" column="address_Id" /> -->
+<!-- 		<result property="address" column="address" /> -->
+<!-- 		<result property="addressDetail" column="address_Detail" /> -->
+<!-- 		<result property="zonecode" column="zonecode" /> -->
+<!-- 	  </collection> -->
+	</resultMap>
+	<select id="getNestedAddressUserAccount" resultMap="nestedAddressUserAccount">
+	 	SELECT *
+		FROM USER_ACCOUNT ACT, USER_DETAIL DET
+		WHERE DET.MEMBER_SERIAL(+) = ACT.MEMBER_SERIAL
+        ORDER BY ACT.MEMBER_SERIAL
+	</select>
+	
+	<select id="getUserByIdPassword" parameterType="UserDTO" resultType="UserDTO">
+		SELECT *
+		FROM USER_ACCOUNT ACT, USER_DETAIL DET
+		WHERE ACT.MEMBER_SERIAL = DET.MEMBER_SERIAL
+		AND ID = #{id}
+		AND PASSWORD = #{password}
+	</select>
+<!-- 	TODO 순서 바꿔도 괜찮은지 확인 -->
+	<select id="getUserDtoBySerial" parameterType="UserDTO" resultType="UserDTO">
+		SELECT *
+		FROM USER_ACCOUNT ACT, USER_DETAIL DET
+		WHERE DET.MEMBER_SERIAL(+) = ACT.MEMBER_SERIAL
+		AND DET.MEMBER_SERIAL = #{member_serial}
+        ORDER BY ACT.MEMBER_SERIAL
+	</select>
+	
+	<select id="getUserDtoList" resultType="UserDTO">
+		SELECT *
+		FROM USER_ACCOUNT ACT, USER_DETAIL DET
+		WHERE DET.MEMBER_SERIAL(+) = ACT.MEMBER_SERIAL
+        ORDER BY ACT.MEMBER_SERIAL
+	</select>
+	
+	<select id="getUserList" resultType="UserAccount">
+		SELECT *
+		FROM USER_ACCOUNT
+		ORDER BY MEMBER_SERIAL
+<!-- 		SELECT * -->
+<!-- 		FROM USER_ACCOUNT ACT, USER_DETAIL DET -->
+<!-- 		WHERE DET.MEMBER_SERIAL = ACT.MEMBER_SERIAL -->
+<!--         ORDER BY ACT.MEMBER_SERIAL -->
+	</select>
+	
+
+	<insert id="insertUserAccount" parameterType="UserAccount">
+				INSERT INTO USER_ACCOUNT (MEMBER_SERIAL
+						, ID, EMAIL, NICKNAME, CITIZEN_ID, PHONE, PASSWORD, IMAGE_SOURCE)
+				VALUES (MEMBER_SERIAL_SEQ.NEXTVAL
+						, #{id}, #{email}, #{nickname}, #{citizen_id}, #{phone}, #{password}, #{image_source})
+	</insert>
+
+	<insert id="insertTemporaryUserAccount" parameterType="UserAccount" >
+		INSERT INTO USER_ACCOUNT (MEMBER_SERIAL, ID, EMAIL, PHONE, PASSWORD)
+		VALUES (MEMBER_SERIAL_SEQ.NEXTVAL, 
+				#{id}, #{email}, #{phone}, #{password})
+	</insert>
+
+	<delete id="deleteUserAccount" parameterType="UserAccount">
+		DELETE FROM USER_ACCOUNT WHERE ID = #{id}
+	</delete>
+
+	<update id="setPassword" parameterType="UserAccount">
+		UPDATE USER_ACCOUNT
+		SET PASSWORD = #{password}
+		WHERE ID = #{id}
+	</update>
+	
+	<update id="updateUserAccount" parameterType="UserAccount">
+		UPDATE USER_ACCOUNT
+		SET PASSWORD = #{password}
+		, EMAIL = #{email}
+		, PHONE = #{phone}
+		, NICKNAME = #{nickname}
+		WHERE ID = #{id}
+	</update>
+
+	<select id="getUserAccount" parameterType="UserAccount" resultType="UserAccount">
+		SELECT * FROM USER_ACCOUNT
+		WHERE MEMBER_SERIAL = #{member_serial}
+	</select>
+	
+	<select id="searchUserAccount" parameterType="UserAccount" resultType="UserAccount">
+		SELECT * FROM USER_ACCOUNT
+		WHERE ID = #{id}
+		AND EMAIL = #{email}
+		AND PHONE = #{phone}
+	</select>
+
+	<select id="loginValidation" parameterType="UserAccount" resultType="UserAccount">
+		SELECT * FROM USER_ACCOUNT WHERE ID = #{id} AND PASSWORD = #{password}
+	</select>
+	
+	<select id="checkIdValidation" parameterType="UserAccount" resultType="UserAccount">
+		SELECT * FROM USER_ACCOUNT WHERE ID = #{id}
+	</select>
+	
+	<select id="searchUserList" resultType="UserAccount">
+	</select>
+	
+	<!-- 
+	<select id="getUserList" parameterType="User" resultType="User">
+		SELECT * FROM User
+		WHERE 1=1
+		<if test="searchCondition == 'TITLE'">
+			AND TITLE LIKE '%'|| #{searchKeyword} ||'%'
+		</if>
+		<if test="searchCondition == 'CONTENT'">
+			AND CONTENT LIKE '%'|| #{searchKeyword} ||'%'
+		</if>
+		ORDER BY SEQ DESC
+	</select>
+	-->
+<!--
+	<select id="getUserList_T" parameterType="User" resultType="User">
+		SELECT * FROM User WHERE TITLE LIKE '%'|| #{searchKeyword} ||'%'
+		ORDER BY SEQ DESC
+	</select>
+	<select id="getUserList_C" parameterType="User" resultType="User">
+		SELECT * FROM User WHERE CONTENT LIKE '%'|| #{searchKeyword} ||'%'
+		ORDER BY SEQ DESC
+	</select>
+	 -->
+	 
+	 <!-- 포인트 검색 (총 포인트도 같이 검색) -->
+	 <select id="searchMyPoint" parameterType="Order" resultType="Order">
+		 SELECT O.ORDER_DATE, O.TOTALSUM, O.ORDER_POINT, A.POINT
+		  FROM STORE_ORDER O, USER_ACCOUNT A
+		   WHERE O.MEMBER_SERIAL = A.MEMBER_SERIAL
+		    AND O.MEMBER_SERIAL = #{member_serial}
+		  ORDER BY O.ORDER_DATE DESC
+	 	<!-- ORDER테이블 컬럼에 ORDER_POINT가 없었을 때 쿼리문(적립포인트계산)
+	 	SELECT ORDER_DATE, TOTALSUM , FLOOR(TOTALSUM * 0.001) AS ORDER_POINT
+		FROM STORE_ORDER
+		WHERE MEMBER_SERIAL = #{member_serial}
+		ORDER BY ORDER_DATE DESC -->
+	 </select>
+	 
+	 <!-- 최신순 포인트내역 검색 -->
+	 <select id="mainSearchPoint" parameterType="UserAccount" resultType="Order">
+	
+	 SELECT MEMBER_SERIAL, ORDER_DATE, TOTALSUM, ORDER_POINT, POINT
+		FROM (SELECT O.MEMBER_SERIAL, O.ORDER_DATE, O.TOTALSUM, O.ORDER_POINT, A.POINT
+			   FROM STORE_ORDER O, USER_ACCOUNT A
+			   WHERE O.MEMBER_SERIAL = A.MEMBER_SERIAL
+			   AND O.MEMBER_SERIAL = #{member_serial}
+			   ORDER BY O.ORDER_DATE DESC)
+	  WHERE ROWNUM <![CDATA[ <= ]]> 10
+	 </select>
+	 
+	 <!-- 개인 포인트내역출력 시 페이징을 위한 구매내역 count -->
+	 <select id="searchforPointPaging" resultType="int">
+	 	SELECT COUNT(*)
+		FROM STORE_ORDER 
+		WHERE MEMBER_SERIAL = #{member_serial}
+	 </select>
+	 
+</mapper>

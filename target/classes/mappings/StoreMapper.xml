@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Store">
+
+	<insert id="insertStore" parameterType="map">
+	 	INSERT INTO STORES (ID, NAME, OWNER, DESCR, level2, ADDRESS, PHONE2)    
+		VALUES (ID_SEQ.NEXTVAL, #{name}, #{owner}, #{descr}, #{level2}, #{address}, #{phone2})
+	</insert>
+	
+	<update id="insertHoliday" parameterType="map">
+	 	UPDATE STORES
+	 	SET HOLIDAYS = #{holidays}
+		WHERE ID = #{id}
+	</update>
+	
+	<delete id="deleteTest" parameterType="int">
+		DELETE FROM STORES
+		WHERE ID = #{id}
+	</delete>
+	
+	<select id="getStoreList" resultType="map">
+		SELECT *
+		FROM STORES
+		ORDER BY LEVEL2 
+	</select>
+	
+	<select id="getStoreDetail" resultType="map">
+		SELECT *
+		FROM STORES
+		WHERE ID = #{id}
+	</select>
+
+
+</mapper>
